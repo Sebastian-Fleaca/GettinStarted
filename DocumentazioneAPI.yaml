@@ -1,0 +1,22 @@
+swagger: '2.0'
+info:
+  version: '1.0.0'
+  title: api
+  description: Application Programming Interface
+basePath: /v1
+schemes:
+- https
+tags:
+  - name: User
+    description: Documentazione API
+paths:
+  /home:
+    get:
+      summary: Home page
+      sesponses:
+        200:
+          description: Success
+        404:
+          description: Home not found
+        500:
+          description: Internal server error

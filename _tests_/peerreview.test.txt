@@ -1,0 +1,38 @@
+const app = require('./server');
+//const fetch = require("node-fetch");
+const request = require('supertest');
+
+beforeAll(() => {
+ console.log('Jest starting!');
+});
+
+// raggruppa più test cases
+describe('Tests for PeerReview', () => {
+  
+  // test per il metodo GET
+  test('Peerreview GET', async () => {
+    return await request(app).get('/peerreview')
+      .expect(200)
+      .then(res => expect(res.status).toEqual(200));
+  });
+
+  // test per il metodo POST
+  test('PeerReview POST', async () => {
+    var res = await request(app).post('/peerreview');
+    expect(res.status).toBe(201);
+    expect(res.get('content-type')).toContain('application/json');
+  });
+/*
+  // test per il metodo PUT
+  test('PeerReview PUT', async () => {
+    var res = await request(app).post('/peerreview');
+    expect(res.status).toBe(200);
+    expect(res.get('content-type')).toContain('application/json');
+  });
+*/
+
+});
+
+afterAll(() => {
+  app.close();
+});

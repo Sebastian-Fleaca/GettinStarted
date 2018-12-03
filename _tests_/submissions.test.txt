@@ -1,0 +1,21 @@
+const app = require('./server');
+//const fetch = require("node-fetch");
+const request = require('supertest');
+
+beforeAll(() => {
+ console.log('Jest starting!\n');
+});
+
+//raggruppa più test cases
+describe('Tests for Submissions', () => {
+
+  test('Submissions POST', async () => {
+    var res = await request(app).post('/submissions');
+    expect(res.status).toBe(201);
+  });
+
+});
+
+afterAll(() => {
+  app.close();
+});

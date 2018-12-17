@@ -1,7 +1,7 @@
 
 const express = require('express');
 const bodyParser = require('body-parser');
-const http = require('http'); 
+const http = require('http');
 
 const app = express();
 app.use(bodyParser.json());
@@ -9,9 +9,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 const PORT = process.env.PORT || 3000;
 
-const SERVER = app.listen(PORT, () => 
+const SERVER = app.listen(PORT, () =>
     console.log('GitWizards\' API\'s listening on port'
-                + PORT));
+        + PORT));
 
 /*
 RENDER PAGE AND PASS DATA TO IT
@@ -19,112 +19,142 @@ res.status(200).render('pagina.ejs', {data: data});
 */
 
 /* Example variables */
-const task_prova = {id: 123456,
-                    numeroDomanda: 2,
-                    question: 'diametro della Terra?',
-                    type: 1,
-                    answers: ['9.742 km',
-                              '19.742 km',
-                              '12.742 km'],
-                    correctAnswer: '3',
-                    studentAnswer: '1'};
+var peerrev_prova = {
+    id: 0,
+    examid: 234,
+    task: {
+        'application/json': {
+            id: 123,
+            numeroDomanda: 2,
+            question: 'diametro della Terra?',
+            type: 1,
+            answers: [
+                '9.742 km',
+                '19.742 km',
+                '12.742 km'
+            ]
+        }
+    },
+    studentanswer: 3,
+    mark: 30,
+    description: 'The task is perfect as it is',
+    deadline: 900
+}
 
-const task_prova2 = task_prova;
+var peerrev_prova2 = peerrev_prova;
+peerrev_prova2.id = 1;
 
-var tasks = [task_prova, task_prova2];
+var peerReviews = [peerrev_prova, peerrev_prova2];
 
 //var tasks = null;
 
-const exam_submission = { num: 42 };
+var exam_submission = { num: 42 };
+
+var submissions = [exam_submission];
 
 
 /* Peer Review */
 
 // Peer Review GET
-app.get('/peerreview', async (req, res) => {
+app.get('/peerreview', (req, res) => {
     try {
-        if(tasks == null) {
-            await res.status(200).send("Al momento non ci sono peer review.");
+        if (peerReviews == null) {
+            res.status(200).send("Al momento non ci sono peer review.");
         }
         else {
-            await res.status(200).json(tasks);
+            res.status(200).json(peerReviews);
         }
     }
     catch (error) {
-        res.status();
-        console.log(res.status(error) + "\n");
+        res.status(400).end();      //AGGIUNGI END
+        console.log("\n");
     }
 });
 
-// Peer Review POST
-app.post('/peerreview', async (req, res) => {
-    var id_new = await req.body.id;     // just an example
-    var user = await req.header.user_id;    // header field
-    var numeroDomanda_new = await req.body.numeroDomanda;
-    var question_new = await req.body.question;
-    var type_new = await req.body.type;
-    var answers_new = await req.body.answers;
-    var correctAnswer_new = await req.body.correctAnswer;
-    var studentAnswer_new = await req.body.studentAnswer; 
-    var task_inserita = await { id:id_new,
-                            numeroDomanda:numeroDomanda_new,
-                            question:question_new,
-                            type:type_new,
-                            answers:answers_new,
-                            correctAnswer:correctAnswer_new,
-                            studentAnswer:studentAnswer_new
-                        };
-    try {
-        if(numeroDomanda_new === task_prova.numeroDomanda){
-            res.status(409).send("Esiste gia' una domanda con ID: "
-                                + task_prova.id);
-        }
-        else if(/*!*/(res.body instanceof Object)){
-            res.status(400);
+/* POST method for Peer Review */
+app.post('/peerreview', (req, res) => {
+    var user = req.header.user_id;    // header field
+
+    var new_id;
+    if (peerReviews == null) { id_new = 0; }
+    else { new_id = peerReviews.length; }
+
+    let new_peerrev = {
+        id: new_id,
+        examid: req.body.examid,
+        task: req.body.task,
+        studentanswer: req.body.studentanswer,
+        mark: req.body.mark,
+        description: req.body.description,
+        deadline: req.body.deadline
+    };
+    try {       //ATTENZIONE AL CHECK
+        if (!(req.body instanceof Object) || Object.keys(req.body).length < 6) {
+            res.status(400).end();
         }
         else {
-            tasks.push(task_inserita);
-            res.status(201).json(task_inserita);
-            console.log(task_inserita + "\n");
+            peerReviews.push(new_peerrev);
+            res.status(201).json(new_peerrev);
+            console.log(new_peerrev + "\n");
         }
     }
     catch (error) {
-        res.status();
-        console.log(res.status() + "\n");
+        res.status().end();
+        console.log("\n");
     }
 })
 
-// Peer Review PUT
-app.put('/peerreview/:id', async (req, res) => {
+/* PUT method for Peer Review */
+app.put('/peerreview/:id', (req, res) => {
     try {
-        const index = await tasks.findIndex((item) => {
-            if(item.id===parseInt(req.params.id)){
+        const index = peerReviews.findIndex((item) => {
+            if (item.id === parseInt(req.params.id)) {
                 return item;
             }
         });
-        res.status(200).json(tasks[index]);
-        console.log(tasks[index] + "\n");
+        var new_peerrev = {
+            id: req.params.id,
+            examid: req.body.examid,
+            task: req.body.task,
+            studentanswer: req.body.studentanswer,
+            mark: req.body.mark,
+            description: req.body.description,
+            deadline: req.body.deadline
+        };
+        peerReviews[index] = new_peerrev;
+        res.status(200).json(peerReviews[index]);
+        console.log(peerReviews[index] + "\n");
     }
     catch (error) {
-        res.status();
-        console.log(res.status() + "\n");
+        res.status().end();
+        console.log("\n");
     }
 })
 
 
 /* Submissions */
 
+/* GET method for Submission */
 // DA ELIMINARE
-/*
-app.get('/submissions', async (req, res) => {
+app.get('/submission', (req, res) => {
     res.status(200).json(exam_submission);
 });
-*/
 
-// Submission POST
-app.post('/submissions', async (req, res) => {
-    var submission = await exam_submission.num;
-    res.status(201).json(submission);
+
+/* POST method for Submission */
+app.post('/submission', (req, res) => {
+    let new_submission = {
+        id: req.body.id,
+        example: req.body.example,
+        description: req.body.description,
+        deadline: req.body.deadline,
+        numerotasks: req.body.numerotasks,
+        teacher: req.body.teacher,
+        tasks: req.body.tasks,
+        students: req.body.students
+    };
+    peerReviews.push(new_submission);
+    res.status(201).json(submissions);
 });
 
 module.exports = SERVER;

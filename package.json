@@ -1,0 +1,26 @@
+{
+  "name": "gettinstarted",
+  "version": "1.0.0",
+  "description": "Just an example project",
+  "main": "app.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sebastian-Fleaca/GettinStarted.git"
+  },
+  "author": "Sebastian",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Sebastian-Fleaca/GettinStarted/issues"
+  },
+  "homepage": "https://github.com/Sebastian-Fleaca/GettinStarted#readme",
+  "devDependencies": {
+    "jest": "^23.6.0",
+    "supertest": "^3.3.0"
+  },
+  "dependencies": {
+    "node-fetch": "^2.3.0"
+  }
+}
